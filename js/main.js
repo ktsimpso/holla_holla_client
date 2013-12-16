@@ -57,41 +57,37 @@
 			});
 		});
 
-		this.views.Home = Marionette.View.extend({
-			template: template_utils.get(origin + '/templates/home.mustache'),
+		this.BaseView = Marionette.View.extend({
+			serializeData: function () {
+				return {};
+			},
 			render: function () {
-				this.$el.html(this.template({}));
-			} 
-		});
-
-		this.router.route('', 'home', function () {
-			var home_view = new that.views.Home();
-			that.content.show(home_view);
-		});
-
-		this.views.Test = Marionette.View.extend({
-			template: template_utils.get(origin + '/templates/test.mustache'),
-			render: function () {
-				this.$el.html(this.template({}));
+				this.$el.html(this.template(this.serializeData()));
 			}
 		});
 
-		this.router.route('test', 'test', function () {
-			var test_view = new that.views.Test();
-			that.content.show(test_view);
+		this.Route = function (path, name, View) {
+			that.router.route(path, name, function () {
+				var view = new View();
+				that.content.show(view);
+			});
+		};
+
+		this.views.Home = this.BaseView.extend({
+			template: template_utils.get(origin + '/templates/home.mustache')
 		});
 
-		this.views.NotFound = Marionette.View.extend({
-			template: template_utils.get(origin + '/templates/404.mustache'),
-			render: function () {
-				this.$el.html(this.template({}));
-			}
+		this.views.Test = this.BaseView.extend({
+			template: template_utils.get(origin + '/templates/test.mustache')
 		});
 
-		this.router.route('404', '404', function () {
-			var not_found_view = new that.views.NotFound();
-			that.content.show(not_found_view);
+		this.views.NotFound = this.BaseView.extend({
+			template: template_utils.get(origin + '/templates/404.mustache')
 		});
+
+		this.Route('', 'home', this.views.Home);
+		this.Route('test', 'test', this.views.Test);
+		this.Route('404', '404', this.views.NotFound);
 
 		success = Backbone.history.start({
 			pushState: true
