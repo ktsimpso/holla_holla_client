@@ -6,7 +6,8 @@ var express = require('express'),
 		'js': true,
 		'templates': true,
 		'css': true,
-		'favicon.ico': true
+		'favicon.ico': true,
+		'robots.txt': true
 	},
 	template_utils;
 
