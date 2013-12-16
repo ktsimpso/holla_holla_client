@@ -25,12 +25,14 @@
 			throw 'Template: ' + template_path + ' not found'; 
 		};
 
+		exports.add = function (template_path) {
+			return function () {
+				return exports.get(template_path);
+			};
+		};
+
 		return exports;
 	}());
-
-	if (!window.location.origin) {
-		window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-	}
 
 	app = new Backbone.Marionette.Application();
 
@@ -74,15 +76,15 @@
 		};
 
 		this.views.Home = this.BaseView.extend({
-			template: template_utils.get(origin + '/templates/home.mustache')
+			template: template_utils.add(origin + '/templates/home.mustache')
 		});
 
 		this.views.Test = this.BaseView.extend({
-			template: template_utils.get(origin + '/templates/test.mustache')
+			template: template_utils.add(origin + '/templates/test.mustache')
 		});
 
 		this.views.NotFound = this.BaseView.extend({
-			template: template_utils.get(origin + '/templates/404.mustache')
+			template: template_utils.add(origin + '/templates/404.mustache')
 		});
 
 		this.Route('', 'home', this.views.Home);
