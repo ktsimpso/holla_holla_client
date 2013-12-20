@@ -1,38 +1,9 @@
-(function () {
-	var template_utils,
-		app;
+require.config({
+	baseUrl: '/js'
+});
 
-	template_utils = (function () {
-		var exports = {},
-			templates = {};
-
-		exports.get = function (template_path) {
-			if (templates.hasOwnProperty(template_path)) {
-				return templates[template_path];
-			}
-
-			$.ajax(template_path, {
-				async: false,
-				success: function (data) {
-					templates[template_path] = Mustache.compile(data);
-				}
-			});
-
-			if (templates.hasOwnProperty(template_path)) {
-				return templates[template_path];
-			}
-
-			throw 'Template: ' + template_path + ' not found'; 
-		};
-
-		exports.add = function (template_path) {
-			return function () {
-				return exports.get(template_path);
-			};
-		};
-
-		return exports;
-	}());
+require(['template_utils', 'shims'], function (template_utils) {
+	var app;
 
 	app = new Backbone.Marionette.Application();
 
@@ -42,7 +13,6 @@
 
 	app.addInitializer(function () {
 		var that = this,
-			origin = window.location.origin,
 			success;
 
 		this.router = new Backbone.Router();
@@ -76,15 +46,15 @@
 		};
 
 		this.views.Home = this.BaseView.extend({
-			template: template_utils.add(origin + '/templates/home.mustache')
+			template: template_utils.add(window.location.origin + '/templates/home.mustache')
 		});
 
 		this.views.Test = this.BaseView.extend({
-			template: template_utils.add(origin + '/templates/test.mustache')
+			template: template_utils.add(window.location.origin + '/templates/test.mustache')
 		});
 
 		this.views.NotFound = this.BaseView.extend({
-			template: template_utils.add(origin + '/templates/404.mustache')
+			template: template_utils.add(window.location.origin + '/templates/404.mustache')
 		});
 
 		this.Route('', 'home', this.views.Home);
@@ -104,4 +74,4 @@
 	});
 
 	app.start({});
-}());
+});
