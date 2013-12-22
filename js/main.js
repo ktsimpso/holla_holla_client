@@ -24,21 +24,13 @@ require.config({
 	}
 });
 
-require(['template_utils', 'backbone.marionette', 'shims'], function (template_utils) {
-	var app;
-
-	app = new Backbone.Marionette.Application();
-
-	app.addRegions({
-		content: '.content'
-	});
-
+require(['app', 'views', 'routes', 'shims'], function (app, views, routes) {
 	app.addInitializer(function () {
 		var that = this,
 			success;
 
-		this.router = new Backbone.Router();
-		this.views = {};
+		this.router = routes.router;
+		this.views = views;
 
 		$(document).on('click', 'a', function (e) {
 			var self = $(this),
@@ -50,38 +42,6 @@ require(['template_utils', 'backbone.marionette', 'shims'], function (template_u
 				trigger: true
 			});
 		});
-
-		this.BaseView = Marionette.View.extend({
-			serializeData: function () {
-				return {};
-			},
-			render: function () {
-				this.$el.html(this.template(this.serializeData()));
-			}
-		});
-
-		this.Route = function (path, name, View) {
-			that.router.route(path, name, function () {
-				var view = new View();
-				that.content.show(view);
-			});
-		};
-
-		this.views.Home = this.BaseView.extend({
-			template: template_utils.add(window.location.origin + '/templates/home.mustache')
-		});
-
-		this.views.Test = this.BaseView.extend({
-			template: template_utils.add(window.location.origin + '/templates/test.mustache')
-		});
-
-		this.views.NotFound = this.BaseView.extend({
-			template: template_utils.add(window.location.origin + '/templates/404.mustache')
-		});
-
-		this.Route('', 'home', this.views.Home);
-		this.Route('test', 'test', this.views.Test);
-		this.Route('404', '404', this.views.NotFound);
 
 		success = Backbone.history.start({
 			pushState: true
