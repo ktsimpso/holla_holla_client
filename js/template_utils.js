@@ -1,5 +1,6 @@
 define(function (require, exports, module) {
-	var templates = {};
+	var templates = {},
+		Mustache = require('mustache');
 
 	exports.get = function (template_path) {
 		if (templates.hasOwnProperty(template_path)) {

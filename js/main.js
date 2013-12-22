@@ -1,8 +1,30 @@
 require.config({
-	baseUrl: '/js'
+	baseUrl: '/js',
+	map: {
+		'*': {
+			'jquery': 'jquery-2.0.3'
+		}
+	},
+	shim: {
+		'mustache': {
+			deps: ['jquery'],
+			exports: 'Mustache'
+		},
+		'underscore': {
+			exports: '_'
+		},
+		'backbone': {
+			deps: ['underscore', 'jquery'],
+			exports: 'Backbone'
+		},
+		'backbone.marionette': {
+			deps: ['backbone'],
+			exports: 'Marionette'
+		}
+	}
 });
 
-require(['template_utils', 'shims'], function (template_utils) {
+require(['template_utils', 'backbone.marionette', 'shims'], function (template_utils) {
 	var app;
 
 	app = new Backbone.Marionette.Application();
