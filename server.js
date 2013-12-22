@@ -32,8 +32,7 @@ template_utils = (function () {
 template_utils.get('index.html');
 
 server.get('*', function (request, response) {
-	var urls = request.params[0].split('/'),
-		static_url = '';
+	var urls = request.params[0].split('/');
 	
 	//remove leading slash
 	urls.shift();
@@ -49,14 +48,8 @@ server.get('*', function (request, response) {
 		return;
 	}
 
-	urls.forEach(function () {
-		static_url += '../';
-	});
-
 	console.log('Serving index.html');
-	response.send(mustache.render(template_utils.get('index.html'), {
-		static_url: static_url
-	}));
+	response.send(mustache.render(template_utils.get('index.html'), {}));
 });
 
 server.use(function(error, request, response, next) {
