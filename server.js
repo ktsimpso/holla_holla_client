@@ -1,6 +1,7 @@
 var express = require('express'),
 	mustache = require('mustache'),
-	fs = require('fs'),
+	fse = require('fs-extra'),
+	hogan = require('hogan.js'),
 	server = express(),
 	statics = {
 		'js': true,
@@ -9,7 +10,26 @@ var express = require('express'),
 		'favicon.ico': true,
 		'robots.txt': true
 	},
+	output_directory = 'tmp',
 	template_utils;
+
+//Copying files to temp directory
+Object.keys(statics).forEach(function (static_file) {
+	fse.copySync(static_file, output_directory + '/' + static_file);
+});
+
+//Pre-compiling templates
+fse.readdirSync(output_directory + '/templates').forEach(function (template) {
+	var js_file = 'define(function(require, exports, module) { var hogan = require("hogan");',
+		js_file_name = output_directory + '/js/templates/' + template.split('.')[0] + '.js';
+
+	template = fse.readFileSync(output_directory + '/templates/' + template).toString();
+	template = hogan.compile(template, {asString: true});
+
+	js_file += 'exports = new hogan.Template(' + template +');return exports;});\n';
+
+	fse.outputFileSync(js_file_name, js_file);
+});
 
 template_utils = (function () {
 	var exports = {},
@@ -20,7 +40,7 @@ template_utils = (function () {
 			return templates[template_path];
 		}
 
-		templates[template_path] = fs.readFileSync(template_path).toString();
+		templates[template_path] = fse.readFileSync(template_path).toString();
 		mustache.parse(templates[template_path]);
 
 		return templates[template_path];
@@ -44,6 +64,7 @@ server.get('*', function (request, response) {
 
 	if (statics[urls[0]]) {
 		console.log('Serving static file: ' + urls.join('/'));
+		urls.unshift(output_directory);
 		response.sendfile(urls.join('/'));
 		return;
 	}
