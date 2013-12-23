@@ -1,5 +1,4 @@
 var express = require('express'),
-	mustache = require('mustache'),
 	fse = require('fs-extra'),
 	hogan = require('hogan.js'),
 	server = express(),
@@ -11,7 +10,7 @@ var express = require('express'),
 		'robots.txt': true
 	},
 	output_directory = 'tmp',
-	template_utils;
+	index_template;
 
 //Copying files to temp directory
 Object.keys(statics).forEach(function (static_file) {
@@ -31,25 +30,7 @@ fse.readdirSync(output_directory + '/templates').forEach(function (template) {
 	fse.outputFileSync(js_file_name, js_file);
 });
 
-template_utils = (function () {
-	var exports = {},
-		templates = {};
-
-	exports.get = function (template_path) {
-		if (templates.hasOwnProperty(template_path)) {
-			return templates[template_path];
-		}
-
-		templates[template_path] = fse.readFileSync(template_path).toString();
-		mustache.parse(templates[template_path]);
-
-		return templates[template_path];
-	};
-
-	return exports;
-}());
-
-template_utils.get('index.html');
+index_template = hogan.compile(fse.readFileSync('index.html').toString());
 
 server.get('*', function (request, response) {
 	var urls = request.params[0].split('/');
@@ -70,7 +51,7 @@ server.get('*', function (request, response) {
 	}
 
 	console.log('Serving index.html');
-	response.send(mustache.render(template_utils.get('index.html'), {}));
+	response.send(index_template.render({}));
 });
 
 server.use(function(error, request, response, next) {
