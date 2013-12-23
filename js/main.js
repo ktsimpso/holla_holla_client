@@ -24,7 +24,7 @@ require.config({
 	}
 });
 
-require(['app', 'views', 'routes', 'shims'], function (app, views, routes) {
+require(['app', 'views', 'routes'], function (app, views, routes) {
 	app.addInitializer(function () {
 		var that = this,
 			success;
