@@ -56,25 +56,11 @@ requirejs.optimize(require_config, function (modules) {
 	console.log('Success: ' + modules);
 	index_template = hogan.compile(fse.readFileSync('index.html').toString());
 
+	server.use(express.logger());
+	server.use(express.compress());
+	server.use(express.static(__dirname+'/tmp'));
+
 	server.get('*', function (request, response) {
-		var urls = request.params[0].split('/');
-
-		//remove leading slash
-		urls.shift();
-
-		//remove trailing slash if provided
-		if (urls[urls.length - 1] === '') {
-			urls.pop();
-		}
-
-		if (statics[urls[0]]) {
-			console.log('Serving static file: ' + urls.join('/'));
-			urls.unshift(output_directory);
-			response.sendfile(urls.join('/'));
-			return;
-		}
-
-		console.log('Serving index.html');
 		response.send(index_template.render({}));
 	});
 
