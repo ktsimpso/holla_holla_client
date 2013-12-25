@@ -23,7 +23,7 @@ Object.keys(statics).forEach(function (static_file) {
 
 //Pre-compiling templates
 fse.readdirSync(output_directory + '/templates').forEach(function (template) {
-	var js_file = 'define(function(require, exports, module) { var hogan = require("hogan");',
+	var js_file = 'if (typeof module === "object" && typeof define !== "function") {var define = function (factory) {module.exports = factory(require, exports, module);};}define(function(require, exports, module) { var hogan = require("hogan.js");',
 		js_file_name = output_directory + '/js/templates/' + template.split('.')[0] + '.js';
 
 	template = fse.readFileSync(output_directory + '/templates/' + template).toString();
@@ -38,6 +38,11 @@ fse.readdirSync(output_directory + '/templates').forEach(function (template) {
 fse.deleteSync(output_directory + '/templates');
 delete statics['templates'];
 
+/*
+var test = require('./' + output_directory + '/js/views/404');
+console.log(test.template.render({}));
+return;*/
+
 require_config = {
 	baseUrl: output_directory + '/js',
 	name: 'almond',
@@ -45,7 +50,7 @@ require_config = {
 	mainConfigFile: output_directory + '/js/main.js',
 	out: output_directory + '/tmp/main.js',
 	wrap: false
-}
+};
 
 requirejs.optimize(require_config, function (modules) {
 	//Clean up optimizer

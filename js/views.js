@@ -10,17 +10,9 @@ define(function (require, exports, module) {
 		}
 	});
 
-	exports['Home'] = this.BaseView.extend({
-		template: require('templates/home')
-	});
-
-	exports['Test'] = this.BaseView.extend({
-		template: require('templates/test')
-	});
-
-	exports['NotFound'] = this.BaseView.extend({
-		template: require('templates/404')
-	});
+	exports['Home'] = exports.BaseView.extend(require('views/home'));
+	exports['Test'] = exports.BaseView.extend(require('views/test'));
+	exports['NotFound'] = exports.BaseView.extend(require('views/404'));
 
 	return exports;
 });
