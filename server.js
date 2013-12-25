@@ -11,10 +11,13 @@ var express = require('express'),
 		'robots.txt': true
 	},
 	output_directory = 'tmp',
+	server_output_directory = 'server_tmp',
+	views = {},
 	require_config,
 	index_template;
 
 fse.deleteSync(output_directory);
+fse.deleteSync(server_output_directory);
 
 //Copying files to temp directory
 Object.keys(statics).forEach(function (static_file) {
@@ -38,10 +41,13 @@ fse.readdirSync(output_directory + '/templates').forEach(function (template) {
 fse.deleteSync(output_directory + '/templates');
 delete statics['templates'];
 
-/*
-var test = require('./' + output_directory + '/js/views/404');
-console.log(test.template.render({}));
-return;*/
+//Copying relevant js to server directory
+fse.copySync(output_directory + '/js', server_output_directory + '/js');
+
+//TODO: populate views from routes
+views[''] = require('./' + server_output_directory + '/js/views/home');
+views['test'] = require('./' + server_output_directory + '/js/views/test');
+views['404'] = require('./' + server_output_directory + '/js/views/404');
 
 require_config = {
 	baseUrl: output_directory + '/js',
@@ -63,10 +69,33 @@ requirejs.optimize(require_config, function (modules) {
 
 	server.use(express.logger());
 	server.use(express.compress());
-	server.use(express.static(__dirname+'/tmp'));
+	server.use(express.static(__dirname + '/' + output_directory));
 
 	server.get('*', function (request, response) {
-		response.send(index_template.render({}));
+		var urls = request.params[0].split('/'),
+			normalized_url,
+			content;
+
+		//remove leading slash
+		urls.shift();
+
+		//remove trailing slash if provided
+		if (urls[urls.length - 1] === '') {
+			urls.pop();
+		}
+
+		normalized_url = urls.join('/');
+
+		if (views.hasOwnProperty(normalized_url)) {
+			//TODO: Check for and use serializeData data method
+			content = views[normalized_url].template.render({});
+		} else {
+			content = views['404'].template.render({});
+		}
+
+		response.send(index_template.render({
+			content: content
+		}));
 	});
 
 	server.use(function(error, request, response, next) {
