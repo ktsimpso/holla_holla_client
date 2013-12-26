@@ -13,6 +13,7 @@ var express = require('express'),
 	output_directory = 'tmp',
 	server_output_directory = 'server_tmp',
 	views = {},
+	common_js_shim = 'if (typeof module === "object" && typeof define !== "function") {var define = function (factory) {module.exports = factory(require, exports, module);};}',
 	require_config,
 	index_template;
 
@@ -26,7 +27,7 @@ Object.keys(statics).forEach(function (static_file) {
 
 //Pre-compiling templates
 fse.readdirSync(output_directory + '/templates').forEach(function (template) {
-	var js_file = 'if (typeof module === "object" && typeof define !== "function") {var define = function (factory) {module.exports = factory(require, exports, module);};}define(function(require, exports, module) { var hogan = require("hogan.js");',
+	var js_file = 'define(function(require, exports, module) { var hogan = require("hogan.js");',
 		js_file_name = output_directory + '/js/templates/' + template.split('.')[0] + '.js';
 
 	template = fse.readFileSync(output_directory + '/templates/' + template).toString();
@@ -43,6 +44,25 @@ delete statics['templates'];
 
 //Copying relevant js to server directory
 fse.copySync(output_directory + '/js', server_output_directory + '/js');
+
+//Adding Commonjs adapters
+fse.readdirSync(server_output_directory + '/js/views').forEach(function (view) {
+	var js_file_name = server_output_directory + '/js/views/' + view;
+
+	view = fse.readFileSync(js_file_name).toString();
+	view = common_js_shim + view;
+
+	fse.outputFileSync(js_file_name, view);
+});
+
+fse.readdirSync(server_output_directory + '/js/templates').forEach(function (template) {
+	var js_file_name = server_output_directory + '/js/templates/' + template;
+
+	template = fse.readFileSync(js_file_name).toString();
+	template = common_js_shim + template;
+
+	fse.outputFileSync(js_file_name, template);
+});
 
 //TODO: populate views from routes
 views[''] = require('./' + server_output_directory + '/js/views/home');
