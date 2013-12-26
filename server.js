@@ -47,7 +47,7 @@ delete statics['templates'];
 shared_files.forEach(function (file) {
 	fse.copySync(output_directory + '/js/' + file, server_output_directory + '/' + file);
 
-	//Adding Commonjs adapters
+	//Adding Commonjs adapter
 	fse.readdirSync(server_output_directory + '/' + file).forEach(function (item) {
 		var js_file_name = server_output_directory + '/' + file + '/' + item;
 

@@ -27,6 +27,7 @@ require.config({
 require(['app', 'views', 'routes'], function (app, views, routes) {
 	app.addInitializer(function () {
 		var that = this,
+			silent = true,
 			success;
 
 		this.router = routes.router;
@@ -43,11 +44,16 @@ require(['app', 'views', 'routes'], function (app, views, routes) {
 			});
 		});
 
+		if (window.location.hash) {
+			silent = false;
+		}
+
 		success = Backbone.history.start({
-			pushState: true
+			pushState: true,
+			silent: silent
 		});
 
-		if (!success) {
+		if (!silent && !success) {
 			this.router.navigate('404', {
 				trigger: true,
 				replace: true
