@@ -13,6 +13,7 @@ var express = require('express'),
 	output_directory = 'tmp',
 	server_output_directory = 'server_tmp',
 	views = {},
+	shared_files = ['views', 'templates'],
 	common_js_shim = 'if (typeof module === "object" && typeof define !== "function") {var define = function (factory) {module.exports = factory(require, exports, module);};}',
 	require_config,
 	index_template;
@@ -43,31 +44,24 @@ fse.deleteSync(output_directory + '/templates');
 delete statics['templates'];
 
 //Copying relevant js to server directory
-fse.copySync(output_directory + '/js', server_output_directory + '/js');
+shared_files.forEach(function (file) {
+	fse.copySync(output_directory + '/js/' + file, server_output_directory + '/' + file);
 
-//Adding Commonjs adapters
-fse.readdirSync(server_output_directory + '/js/views').forEach(function (view) {
-	var js_file_name = server_output_directory + '/js/views/' + view;
+	//Adding Commonjs adapters
+	fse.readdirSync(server_output_directory + '/' + file).forEach(function (item) {
+		var js_file_name = server_output_directory + '/' + file + '/' + item;
 
-	view = fse.readFileSync(js_file_name).toString();
-	view = common_js_shim + view;
+		item = fse.readFileSync(js_file_name).toString();
+		item = common_js_shim + item;
 
-	fse.outputFileSync(js_file_name, view);
-});
-
-fse.readdirSync(server_output_directory + '/js/templates').forEach(function (template) {
-	var js_file_name = server_output_directory + '/js/templates/' + template;
-
-	template = fse.readFileSync(js_file_name).toString();
-	template = common_js_shim + template;
-
-	fse.outputFileSync(js_file_name, template);
+		fse.outputFileSync(js_file_name, item);
+	});
 });
 
 //TODO: populate views from routes
-views[''] = require('./' + server_output_directory + '/js/views/home');
-views['test'] = require('./' + server_output_directory + '/js/views/test');
-views['404'] = require('./' + server_output_directory + '/js/views/404');
+views[''] = require('./' + server_output_directory + '/views/home');
+views['test'] = require('./' + server_output_directory + '/views/test');
+views['404'] = require('./' + server_output_directory + '/views/404');
 
 require_config = {
 	baseUrl: output_directory + '/js',
