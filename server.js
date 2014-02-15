@@ -58,6 +58,7 @@ shared_files.forEach(function (file) {
 	});
 });
 
+//Adding routes
 fse.readdirSync(server_output_directory + '/routes').forEach(function (route) {
 	var route_name = route.split('.')[0];
 
