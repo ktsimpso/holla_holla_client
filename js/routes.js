@@ -1,6 +1,9 @@
 define(function (require, exports, module) {
 	var views = require('views'),
-		app = require('app');
+		app = require('app'),
+		home = require('routes/home'),
+		test = require('routes/test'),
+		not_found = require('routes/404');
 
 	exports.router = new Backbone.Router();
 
@@ -11,7 +14,7 @@ define(function (require, exports, module) {
 		});
 	};
 
-	exports.Route('', 'home', views['Home']);
-	exports.Route('test', 'test', views['Test']);
-	exports.Route('404', '404', views['NotFound']);
+	exports.Route(home.path, home.name, views[home.view]);
+	exports.Route(test.path, test.name, views[test.view]);
+	exports.Route(not_found.path, not_found.name, views[not_found.view]);
 });

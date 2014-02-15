@@ -13,7 +13,7 @@ var express = require('express'),
 	output_directory = 'tmp',
 	server_output_directory = 'server_tmp',
 	views = {},
-	shared_files = ['views', 'templates'],
+	shared_files = ['views', 'templates', 'routes'],
 	common_js_shim = 'if (typeof module === "object" && typeof define !== "function") {var define = function (factory) {module.exports = factory(require, exports, module);};}',
 	require_config,
 	index_template;
@@ -58,10 +58,12 @@ shared_files.forEach(function (file) {
 	});
 });
 
-//TODO: populate views from routes
-views[''] = require('./' + server_output_directory + '/views/home');
-views['test'] = require('./' + server_output_directory + '/views/test');
-views['404'] = require('./' + server_output_directory + '/views/404');
+fse.readdirSync(server_output_directory + '/routes').forEach(function (route) {
+	var route_name = route.split('.')[0];
+
+	route = require('./' + server_output_directory + '/routes/' + route_name);
+	views[route.path] = require('./' + server_output_directory + '/views/' + route.name);
+});
 
 require_config = {
 	baseUrl: output_directory + '/js',
