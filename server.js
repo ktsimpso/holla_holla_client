@@ -76,6 +76,8 @@ require_config = {
 };
 
 requirejs.optimize(require_config, function (modules) {
+	var key;
+
 	//Clean up optimizer
 	fse.deleteSync(output_directory + '/js');
 	fse.copySync(output_directory + '/tmp/main.js', output_directory + '/js/main.js');
@@ -88,40 +90,25 @@ requirejs.optimize(require_config, function (modules) {
 	server.use(express.compress());
 	server.use(express.static(__dirname + '/' + output_directory));
 
+	for (key in views) {
+		if (views.hasOwnProperty(key)) {
+			server.get('/' + key, (function (key) {
+				return function (request, response) {
+					response.send(index_template.render({
+						content: views[key].template.render(request.params)
+					}));
+				};
+			}(key)));
+		}
+	}
+
 	server.get('*', function (request, response) {
-		var urls = request.params[0].split('/'),
-			normalized_url,
-			content;
-
-		//remove leading slash
-		urls.shift();
-
-		//remove trailing slash if provided
-		if (urls[urls.length - 1] === '') {
-			urls.pop();
-		}
-
-		normalized_url = urls.join('/');
-
-		if (views.hasOwnProperty(normalized_url)) {
-			//TODO: Check for and use serializeData data method
-			content = views[normalized_url].template.render({});
-		} else {
-			content = views['404'].template.render({});
-		}
-
-		response.send(index_template.render({
-			content: content
+		response.send(404, index_template.render({
+			content: views['404'].template.render({})
 		}));
 	});
 
 	server.use(function(error, request, response, next) {
-		if (error.status === 404) {
-			console.log('No file found');
-			response.send(404, 'No such file!');
-			return;
-		}
-
 		console.log('Error!: ' + error.stack);
 		response.send(500, 'Internal Server Error');
 	});
