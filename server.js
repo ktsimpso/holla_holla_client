@@ -76,7 +76,8 @@ require_config = {
 };
 
 requirejs.optimize(require_config, function (modules) {
-	var key;
+	var key,
+		port = 8000;
 
 	//Clean up optimizer
 	fse.deleteSync(output_directory + '/js');
@@ -113,8 +114,12 @@ requirejs.optimize(require_config, function (modules) {
 		response.send(500, 'Internal Server Error');
 	});
 
-	server.listen(8000);
-	console.log('Listening on port 8000');
+	if (process.argv.length >= 3) {
+		port = process.argv[2];
+	}
+
+	server.listen(port);
+	console.log('Listening on port ' + port);
 }, function (error) {
 	console.log('Error: ' + error);
 });
