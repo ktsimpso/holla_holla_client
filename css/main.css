@@ -1,11 +1,21 @@
+/*
+ * Brown: #BF7130
+ * Green: #20BF9F
+ * Red: #B83D3D
+ */
+
 html, body {
 	padding: 0;
 	margin: 0;
 	height: 100%;
+	background-color: #BF7130;
+	color: #000;
+	font-family: sans-serif;
 }
 
 a {
 	text-decoration: none;
+	color: #000;
 }
 
 .content {
@@ -14,7 +24,7 @@ a {
 }
 
 .button {
-	background-color: #FFAA00;
+	background-color: #B83D3D;
 	cursor: pointer;
 	display: inline-block;
 }
