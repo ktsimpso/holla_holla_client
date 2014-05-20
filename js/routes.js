@@ -15,10 +15,12 @@ define(function (require, exports, module) {
 			route.argument_names = [];
 		}
 
+		if (!route.external_dependencies) {
+			route.external_dependencies = [];
+		}
+
 		exports.router.route(route.path, route.name, function () {
-			var data = {
-					data: {}
-				},
+			var data = {},
 				args = Array.prototype.slice.call(arguments),
 				view;
 
@@ -27,7 +29,17 @@ define(function (require, exports, module) {
 			}
 
 			args.forEach(function (argument, index) {
-				data.data[route.argument_names[index]] = argument;
+				data[route.argument_names[index]] = argument;
+			});
+
+			route.external_dependencies.forEach(function (path) {
+				$.ajax({
+					url: 'http://localhost:3000/' + path,
+					success: function (response) {
+						data[path] = response;
+					},
+					async: false
+				});
 			});
 
 			view = new views[route.view](data);

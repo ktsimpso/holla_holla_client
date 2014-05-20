@@ -3,8 +3,8 @@ define(function (require, exports, module) {
 		
 	exports.BaseView = Marionette.View.extend({
 		initialize: function (data) {
-			if (data.data) {
-				this.data = data.data;
+			if (data) {
+				this.data = data;
 			} else {
 				this.data = {};
 			}
