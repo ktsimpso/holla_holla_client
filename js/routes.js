@@ -1,6 +1,7 @@
 define(function (require, exports, module) {
 	var views = require('views'),
 		app = require('app'),
+		models = require('models'),
 		routes = [];
 
 	routes.push(require('routes/home'));
@@ -15,8 +16,8 @@ define(function (require, exports, module) {
 			route.argument_names = [];
 		}
 
-		if (!route.external_dependencies) {
-			route.external_dependencies = [];
+		if (!route.models) {
+			route.models = [];
 		}
 
 		exports.router.route(route.path, route.name, function () {
@@ -32,14 +33,10 @@ define(function (require, exports, module) {
 				data[route.argument_names[index]] = argument;
 			});
 
-			route.external_dependencies.forEach(function (path) {
-				$.ajax({
-					url: 'http://localhost:3000/' + path,
-					success: function (response) {
-						data[path] = response;
-					},
-					async: false
-				});
+			route.models.forEach(function (model) {
+				var modelClass = new models[model]();
+				modelClass.fetch({async:false});
+				data[model.toLowerCase()] = modelClass.toJSON();
 			});
 
 			view = new views[route.view](data);

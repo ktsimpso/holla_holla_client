@@ -3,7 +3,7 @@ define(function (require, exports, module) {
 		path: '',
 		name: 'home',
 		view: 'Home',
-		external_dependencies: ['user'] //TODO: Make this backbone model
+		models: ['Users'] // TODO: This should be on the view not the route
 	};
 
 	return exports;
