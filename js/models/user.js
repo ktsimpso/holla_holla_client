@@ -1,9 +1,7 @@
 define(function (require, exports, module) {
 	exports = {
-		path: '',
-		name: 'home',
-		view: 'Home',
-		models: ['users']
+		name: 'user',
+		urlRoot: 'http://localhost:3000/user'
 	};
 
 	return exports;

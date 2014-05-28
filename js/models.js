@@ -1,6 +1,7 @@
 define(function (require, exports, module) {
 	var Backbone = require('backbone'),
-		old_sync = Backbone.sync;
+		old_sync = Backbone.sync,
+		models = [];
 
 	// Allow cross domain http://stackoverflow.com/questions/16041172/backbone-js-wont-make-cross-host-requests
 	Backbone.sync = function(method, model, options) {
@@ -17,12 +18,13 @@ define(function (require, exports, module) {
 		return old_sync(method, model, options);
 	};
 
-	exports['User'] = Backbone.Model.extend({
-		urlRoot: 'http://localhost:3000/user'
-	});
+	models.push(require('models/user'));
 
-	exports['Users'] = Backbone.Collection.extend({
-		model: exports['User'],
-		url: 'http://localhost:3000/user'
+	models.forEach(function (model) {
+		exports[model.name] = Backbone.Model.extend(model);
+		exports[model.name + 's'] = Backbone.Collection.extend({
+			model: exports[model.name],
+			url: model.urlRoot
+		});
 	});
 });
