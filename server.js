@@ -2,6 +2,8 @@ var express = require('express'),
 	fse = require('fs-extra'),
 	hogan = require('hogan.js'),
 	requirejs = require('requirejs'),
+	async = require('async'),
+	requestHttp = require('request'),
 	server = express(),
 	statics = {
 		'js': true,
@@ -13,7 +15,8 @@ var express = require('express'),
 	output_directory = 'tmp',
 	server_output_directory = 'server_tmp',
 	views = {},
-	shared_files = ['views', 'templates', 'routes'],
+	models = {},
+	shared_files = ['views', 'templates', 'routes', 'models'],
 	common_js_shim = 'if (typeof module === "object" && typeof define !== "function") {var define = function (factory) {module.exports = factory(require, exports, module);};}',
 	require_config,
 	index_template;
@@ -58,12 +61,26 @@ shared_files.forEach(function (file) {
 	});
 });
 
+//Adding models
+fse.readdirSync(server_output_directory + '/models').forEach(function (model) {
+	var model_name = model.split('.')[0];
+
+	model = require('./' + server_output_directory + '/models/' + model_name);
+	model.url = model.urlRoot + '/:id'
+	models[model.name] = model;
+	models[model.name + 's'] = {
+		'url': model.urlRoot,
+		'name': model.name + 's'
+	};
+});
+
 //Adding routes
 fse.readdirSync(server_output_directory + '/routes').forEach(function (route) {
 	var route_name = route.split('.')[0];
 
 	route = require('./' + server_output_directory + '/routes/' + route_name);
 	views[route.path] = require('./' + server_output_directory + '/views/' + route.name);
+	views[route.path].models = route.models || [];
 });
 
 require_config = {
@@ -95,9 +112,40 @@ requirejs.optimize(require_config, function (modules) {
 		if (views.hasOwnProperty(key)) {
 			server.get('/' + key, (function (key) {
 				return function (request, response) {
-					response.send(index_template.render({
-						content: views[key].template.render(request.params)
-					}));
+					var data = request.params,
+						view = views[key],
+						parallel_options = {};
+
+					view.models.forEach(function (model) {
+						model = models[model];
+
+						parallel_options[model.name] = function (callback) {
+							requestHttp({
+								url: model.url,
+								json: true
+							}, function (err, response, body) {
+								callback(err, body);
+							});
+						};
+					});
+
+					async.parallel(parallel_options, function (err, results) {
+						if (err) {
+							throw err;
+						}
+
+						var key;
+
+						for (key in results) {
+							if (results.hasOwnProperty(key)) {
+								data[key] = results[key];
+							}
+						}
+
+						response.send(index_template.render({
+							content: view.template.render(data)
+						}));
+					});
 				};
 			}(key)));
 		}
