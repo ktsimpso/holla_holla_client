@@ -1,8 +1,7 @@
 define(function (require, exports, module) {
 	exports = {
-		path: 'test',
-		name: 'test',
-		view: 'Test'
+		name: 'deal',
+		urlRoot: 'http://localhost:3000/deal'
 	};
 
 	return exports;

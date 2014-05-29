@@ -19,6 +19,7 @@ define(function (require, exports, module) {
 	};
 
 	models.push(require('models/user'));
+	models.push(require('models/deal'));
 
 	models.forEach(function (model) {
 		exports[model.name] = Backbone.Model.extend(model);

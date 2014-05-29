@@ -5,7 +5,6 @@ define(function (require, exports, module) {
 		routes = [];
 
 	routes.push(require('routes/home'));
-	routes.push(require('routes/test'));
 	routes.push(require('routes/404'));
 	routes.push(require('routes/var'));
 

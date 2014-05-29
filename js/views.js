@@ -18,7 +18,6 @@ define(function (require, exports, module) {
 	});
 
 	exports['Home'] = exports.BaseView.extend(require('views/home'));
-	exports['Test'] = exports.BaseView.extend(require('views/test'));
 	exports['NotFound'] = exports.BaseView.extend(require('views/404'));
 	exports['Var'] = exports.BaseView.extend(require('views/var'));
 

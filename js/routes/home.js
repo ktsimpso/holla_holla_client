@@ -3,7 +3,7 @@ define(function (require, exports, module) {
 		path: '',
 		name: 'home',
 		view: 'Home',
-		models: ['users']
+		models: ['deals']
 	};
 
 	return exports;
