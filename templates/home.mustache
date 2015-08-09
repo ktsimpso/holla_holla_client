@@ -1,7 +1,28 @@
-<ul>
+<div class="deals">
 	{{#deals}}
-		<li>
-			{{user.name}} Saw dollar chocolate milk at {{store.name}} on {{date}}
-		</li>
+		<div class="tile">
+			<div class="deal">
+				<div class="info">
+					<div class="store">
+						{{store.name}}
+					</div>
+					<div class="date">
+						{{human_date}}
+					</div>
+				</div>
+				<div class="actions">
+					<div class="action">
+						<div class="button">
+							I saw this!
+						</div>
+					</div>
+					<div class="action">
+						<div class="button dark">
+							It's over :(
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	{{/deals}}
-</ul>
+</div>

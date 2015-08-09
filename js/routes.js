@@ -21,8 +21,11 @@ define(function (require, exports, module) {
 
 		exports.router.route(route.path, route.name, function () {
 			var data = {},
-				args = Array.prototype.slice.call(arguments),
-				view;
+				args = Array.prototype.slice.call(arguments).filter(function (arg) {
+					return arg !== null;
+				}),
+				view,
+				xhrRequests;
 
 			if (args.length !== route.argument_names.length) {
 				throw new Error('Expected ' + route.argument_names.length + ' arguments but got ' + args.length);
@@ -32,15 +35,19 @@ define(function (require, exports, module) {
 				data[route.argument_names[index]] = argument;
 			});
 
-			route.models.forEach(function (model) {
+			xhrRequests = route.models.map(function (model) {
 				var modelClass = new models[model]();
-				modelClass.fetch({async:false});
-				data[model.toLowerCase()] = modelClass.toJSON();
+				return modelClass.fetch({
+					success: function (modelClass) {
+						data[model.toLowerCase()] = modelClass.toJSON();
+					}
+				});
 			});
 
-			view = new views[route.view](data);
-
-			app.content.show(view);
+			$.when.apply(this, xhrRequests).then(function () {
+				view = new views[route.view](data);
+				app.content.show(view);
+			});
 		});
 	});
 });

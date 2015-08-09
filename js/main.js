@@ -2,24 +2,13 @@ require.config({
 	baseUrl: '/js',
 	map: {
 		'*': {
-			'jquery': 'jquery-2.0.3'
+			'jquery': 'jquery-2.1.4'
 		}
 	},
 	shim: {
 		'mustache': {
 			deps: ['jquery'],
 			exports: 'Mustache'
-		},
-		'underscore': {
-			exports: '_'
-		},
-		'backbone': {
-			deps: ['underscore', 'jquery'],
-			exports: 'Backbone'
-		},
-		'backbone.marionette': {
-			deps: ['backbone'],
-			exports: 'Marionette'
 		}
 	}
 });

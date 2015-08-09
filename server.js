@@ -9,6 +9,7 @@ var express = require('express'),
 		'js': true,
 		'templates': true,
 		'css': true,
+		'img': true,
 		'favicon.ico': true,
 		'robots.txt': true
 	},
@@ -70,7 +71,8 @@ fse.readdirSync(server_output_directory + '/models').forEach(function (model) {
 	models[model.name] = model;
 	models[model.name + 's'] = {
 		'url': model.urlRoot,
-		'name': model.name + 's'
+		'name': model.name + 's',
+		'model': model
 	};
 });
 
@@ -89,7 +91,8 @@ require_config = {
 	include: ['main'],
 	mainConfigFile: output_directory + '/js/main.js',
 	out: output_directory + '/tmp/main.js',
-	wrap: false
+	wrap: false//,
+	//optimize:'none'
 };
 
 requirejs.optimize(require_config, function (modules) {
@@ -138,7 +141,7 @@ requirejs.optimize(require_config, function (modules) {
 
 						for (key in results) {
 							if (results.hasOwnProperty(key)) {
-								data[key] = results[key];
+								data[key] = results[key].map(models[key]['model'].parse);
 							}
 						}
 
