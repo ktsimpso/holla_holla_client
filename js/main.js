@@ -9,6 +9,13 @@ require.config({
 		'mustache': {
 			deps: ['jquery'],
 			exports: 'Mustache'
+		},
+		'resizesensor': {
+			exports: 'ResizeSensor'
+		},
+		'elementqueries': {
+			deps: ['resizesensor'],
+			exports: 'ElementQueries'
 		}
 	}
 });
