@@ -1,5 +1,6 @@
 define(function (require, exports, module) {
-	var Marionette = require('backbone.marionette');
+	var Marionette = require('backbone.marionette'),
+		ElementQueries = require('elementqueries');
 		
 	exports.BaseView = Marionette.View.extend({
 		initialize: function (data) {
@@ -14,6 +15,9 @@ define(function (require, exports, module) {
 		},
 		render: function () {
 			this.$el.html(this.template.render(this.serializeData()));
+		},
+		onShow: function () {
+			ElementQueries.update();
 		}
 	});
 
